@@ -5,14 +5,8 @@ module ::DiscoursePageVisits
     requires_plugin PLUGIN_NAME
 
     def create
-      params = page_visit_params
-
-      if params[:user_id]
-        user = User.find_by(id: params[:user_id])
-        params[:ip_address] = user.ip_address
-      end
-
-      new_page_visit = PageVisit.new(params)
+      params_with_request = page_visit_params.merge(ip_address: request.remote_ip, user_agent: request.user_agent)
+      new_page_visit = PageVisit.new(params_with_request)
 
       if new_page_visit.save
         render json: success_json
@@ -24,16 +18,7 @@ module ::DiscoursePageVisits
     private
 
     def page_visit_params
-      params.require(:page_visit).permit(
-        :user_id,
-        :created_at,
-        :full_url,
-        :ip_address,
-        :user_agent,
-        :topic_id,
-        :visit_time,
-        post_ids: [],
-      )
+      params.permit(:visit_time, :full_url, :user_id, :topic_id, :ip_address, post_ids: [])
     end
   end
 end

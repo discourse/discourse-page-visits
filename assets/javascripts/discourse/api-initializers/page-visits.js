@@ -1,13 +1,12 @@
-import { withPluginApi } from "discourse/lib/plugin-api";
-import { ajax } from "discourse/lib/ajax";
-import { TrackedObject } from "@ember-compat/tracked-built-ins";
-import { tracked } from "@glimmer/tracking";
 import { run } from "@ember/runloop";
-import { schedule } from "@ember/runloop";
+import { ajax } from "discourse/lib/ajax";
+import { withPluginApi } from "discourse/lib/plugin-api";
 import discourseDebounce from "discourse-common/lib/debounce";
 
 let pageVisitData = {};
-let timer = 0;
+let pageEnter;
+let pageExit;
+let visitTime;
 let viewedPostIds = [];
 let screenTrack;
 let postStream;
@@ -20,17 +19,20 @@ export default {
       const currentUser = api.getCurrentUser();
       const topicController = api.container.lookup("controller:topic");
 
-      api.onPageChange((route) => {
+      api.onPageChange(() => {
+        if (pageEnter) {
+          pageExit = new Date();
+          visitTime = pageExit - pageEnter;
+        }
+
         if (Object.keys(pageVisitData).length > 0) {
-          createPageVisitRecord(pageVisitData, viewedPostIds, timer);
+          createPageVisitRecord(pageVisitData, viewedPostIds, visitTime);
         }
 
         reset();
-        startTimer();
 
         const topicId = topicController.model?.id || null;
         postStream = topicController.model?.postStream;
-        console.log(topicController.model);
         if (topicId && postStream) {
           window.addEventListener("scroll", scroll, { passive: true });
         }
@@ -47,7 +49,7 @@ function scroll() {
 
 function captureOnScreenPosts() {
   screenTrack._readPosts.forEach((index) => {
-    // screen track index is 1-based
+    // screenTrack index is 1-based
     const postId = postStream.stream[index - 1];
     if (postId && !viewedPostIds.includes(postId)) {
       viewedPostIds.push(postId);
@@ -55,49 +57,17 @@ function captureOnScreenPosts() {
   });
 }
 
-function reset() {
-  window.removeEventListener("scroll", scroll);
-  viewedPostIds = [];
-  clearInterval(timer);
-  timer = 0;
-}
-
-function startTimer() {
-  setInterval(() => {
-    run(() => tickTimer());
-  }, 1000);
-}
-
-function tickTimer() {
-  timer += 1000;
-}
-
-function captureVisitData(userId, topicId) {
-  const data = {
-    userId: userId || null,
-    fullUrl: window.location.href,
-    userAgent: navigator.userAgent,
-    topicId: topicId,
-  };
-
-  pageVisitData = data;
-}
-
-function resetPageVisitData() {
-  pageVisitData = {};
-}
-
-async function createPageVisitRecord(data, postIds, timer) {
+async function createPageVisitRecord(data, postIds, time) {
   try {
-    await ajax("/page_visits", {
+    await ajax("/page_visits.json", {
       type: "POST",
       data: {
         user_id: data.userId,
         full_url: data.fullUrl,
         user_agent: data.userAgent,
-        topic_id: data.topicId || null,
+        topic_id: data.topicId,
         post_ids: postIds,
-        visit_time: timer,
+        visit_time: time,
       },
     });
   } catch (e) {
@@ -105,4 +75,27 @@ async function createPageVisitRecord(data, postIds, timer) {
   } finally {
     resetPageVisitData();
   }
+}
+
+function captureVisitData(userId, topicId) {
+  const data = {
+    userId: userId || null,
+    fullUrl: window.location.href,
+    userAgent: navigator.userAgent,
+    topicId,
+  };
+
+  pageVisitData = data;
+}
+
+function reset() {
+  window.removeEventListener("scroll", scroll);
+  viewedPostIds = [];
+  pageEnter = new Date();
+  pageExit = null;
+  visitTime = null;
+}
+
+function resetPageVisitData() {
+  pageVisitData = {};
 }

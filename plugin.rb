@@ -11,11 +11,7 @@
 enabled_site_setting :discourse_page_visits_enabled
 
 module ::DiscoursePageVisits
-  PLUGIN_NAME = "discourse-plugin-name"
+  PLUGIN_NAME = "discourse-page-visits"
 end
 
 require_relative "lib/discourse_page_visits/engine"
-
-after_initialize do
-  # Code which should run after Rails has finished booting
-end

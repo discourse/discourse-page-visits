@@ -5,7 +5,8 @@ module ::DiscoursePageVisits
     requires_plugin PLUGIN_NAME
 
     def create
-      params_with_request = page_visit_params.merge(ip_address: request.remote_ip, user_agent: request.user_agent)
+      params_with_request =
+        page_visit_params.merge(ip_address: request.remote_ip, user_agent: request.user_agent)
       new_page_visit = PageVisit.new(params_with_request)
 
       if new_page_visit.save

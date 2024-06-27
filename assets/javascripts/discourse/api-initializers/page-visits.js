@@ -31,7 +31,6 @@ export default {
       });
 
       api.onPageChange(() => {
-        console.log(pageVisitData);
         if (Object.keys(pageVisitData).length > 0) {
           setVisitTime();
           createPageVisitRecord(pageVisitData, viewedPostIds, visitTime);
@@ -65,21 +64,17 @@ function captureOnScreenPosts() {
 }
 
 async function createPageVisitRecord(data, postIds, time) {
-  try {
-    await ajax("/page_visits.json", {
-      type: "POST",
-      data: {
-        user_id: data.userId,
-        full_url: data.fullUrl,
-        user_agent: data.userAgent,
-        topic_id: data.topicId,
-        post_ids: postIds,
-        visit_time: time,
-      },
-    });
-  } catch (e) {
-    console.error(e);
-  }
+  await ajax("/page_visits.json", {
+    type: "POST",
+    data: {
+      user_id: data.userId,
+      full_url: data.fullUrl,
+      user_agent: data.userAgent,
+      topic_id: data.topicId,
+      post_ids: postIds,
+      visit_time: time,
+    },
+  });
 }
 
 function captureVisitData(userId, topicId) {

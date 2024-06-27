@@ -19,17 +19,24 @@ export default {
       const currentUser = api.getCurrentUser();
       const topicController = api.container.lookup("controller:topic");
 
+      // capture when user leaves the page
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          if (Object.keys(pageVisitData).length > 0) {
+            setVisitTime();
+            createPageVisitRecord(pageVisitData, viewedPostIds, visitTime);
+            reset();
+          }
+        }
+      });
+
       api.onPageChange(() => {
-        if (pageEnter) {
-          pageExit = new Date();
-          visitTime = pageExit - pageEnter;
-        }
-
+        console.log(pageVisitData);
         if (Object.keys(pageVisitData).length > 0) {
+          setVisitTime();
           createPageVisitRecord(pageVisitData, viewedPostIds, visitTime);
+          reset();
         }
-
-        reset();
 
         const topicId = topicController.model?.id || null;
         postStream = topicController.model?.postStream;
@@ -72,8 +79,6 @@ async function createPageVisitRecord(data, postIds, time) {
     });
   } catch (e) {
     console.error(e);
-  } finally {
-    resetPageVisitData();
   }
 }
 
@@ -94,8 +99,10 @@ function reset() {
   pageEnter = new Date();
   pageExit = null;
   visitTime = null;
+  pageVisitData = {};
 }
 
-function resetPageVisitData() {
-  pageVisitData = {};
+function setVisitTime() {
+  pageExit = new Date();
+  visitTime = pageExit - pageEnter;
 }

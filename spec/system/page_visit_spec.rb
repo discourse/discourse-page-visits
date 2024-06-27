@@ -76,7 +76,7 @@ RSpec.describe "Page Visits", type: :system do
 
       expect {
         topic_page.visit_topic(topic_2)
-        # sleep 1 # wait for the page visit to be captured asynchronously
+        sleep 1 # wait for the page visit to be captured asynchronously
       }.to change(DiscoursePageVisits::PageVisit, :count).by(1)
 
       expect(DiscoursePageVisits::PageVisit.last).to have_attributes(

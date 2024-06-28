@@ -3,8 +3,6 @@
 RSpec.describe "Page Visits", type: :system do
   fab!(:topic)
   fab!(:post) { Fabricate(:post, topic: topic) }
-  fab!(:topic_2) { Fabricate(:topic) }
-  fab!(:topic_2_post) { Fabricate(:post, topic: topic_2) }
   fab!(:current_user) { Fabricate(:user, refresh_auto_groups: true) }
 
   let(:topic_page) { PageObjects::Pages::Topic.new }

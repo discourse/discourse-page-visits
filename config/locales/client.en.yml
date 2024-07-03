@@ -3,7 +3,7 @@ en:
     admin:
       site_settings:
         categories:
-          TODO_plugin_name: "Plugin Name"
+          discourse_page_visits: "Discourse Page Visits"
   js:
-    discourse_plugin_name:
-      placeholder: placeholder
+    discourse_page_visits:
+      placeholder: "Track and store additional page visit data"

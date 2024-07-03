@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-MyPluginModule::Engine.routes.draw do
-  get "/examples" => "examples#index"
-  # define routes here
+DiscoursePageVisits::Engine.routes.draw do
+  post "/page-visits" => "page_visits#create", :defaults => { format: :json }
 end
 
-Discourse::Application.routes.draw { mount ::MyPluginModule::Engine, at: "my-plugin" }
+Discourse::Application.routes.draw { mount ::DiscoursePageVisits::Engine, at: "" }

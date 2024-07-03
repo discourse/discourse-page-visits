@@ -63,7 +63,7 @@ function captureOnScreenPosts() {
 }
 
 async function createPageVisitRecord(data, postIds, time) {
-  await ajax("/page_visits.json", {
+  await ajax("/page-visits.json", {
     type: "POST",
     data: {
       user_id: data.userId,

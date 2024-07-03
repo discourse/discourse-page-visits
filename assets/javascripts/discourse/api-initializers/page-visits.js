@@ -68,7 +68,6 @@ async function createPageVisitRecord(data, postIds, time) {
     data: {
       user_id: data.userId,
       full_url: data.fullUrl,
-      user_agent: data.userAgent,
       topic_id: data.topicId,
       post_ids: postIds,
       visit_time: time,
@@ -80,7 +79,6 @@ function captureVisitData(userId, topicId) {
   const data = {
     userId: userId || null,
     fullUrl: window.location.href,
-    userAgent: navigator.userAgent,
     topicId,
   };
 

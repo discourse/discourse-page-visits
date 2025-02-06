@@ -1,6 +1,6 @@
 import { ajax } from "discourse/lib/ajax";
+import discourseDebounce from "discourse/lib/debounce";
 import { withPluginApi } from "discourse/lib/plugin-api";
-import discourseDebounce from "discourse-common/lib/debounce";
 
 let pageVisitData = {};
 let pageEnter;

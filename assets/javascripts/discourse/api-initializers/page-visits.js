@@ -13,7 +13,7 @@ let postStream;
 export default {
   name: "page-visits",
   initialize() {
-    withPluginApi("1.24.0", (api) => {
+    withPluginApi((api) => {
       screenTrack = api.container.lookup("service:screen-track");
       const currentUser = api.getCurrentUser();
       const topicController = api.container.lookup("controller:topic");

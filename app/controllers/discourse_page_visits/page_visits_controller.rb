@@ -4,8 +4,6 @@ module ::DiscoursePageVisits
   class PageVisitsController < ::ApplicationController
     requires_plugin PLUGIN_NAME
 
-    skip_before_action :verify_authenticity_token, only: [:create]
-
     def create
       params_with_request =
         page_visit_params.merge(ip_address: request.remote_ip, user_agent: request.user_agent)

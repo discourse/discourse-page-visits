@@ -9,12 +9,14 @@ let screenTrack;
 let postStream;
 let hasLoggedVisit = false;
 let scrollListenerAttached = false;
+let session;
 
 export default {
   name: "page-visits",
   initialize() {
     withPluginApi((api) => {
       screenTrack = api.container.lookup("service:screen-track");
+      session = api.container.lookup("service:session");
       const currentUser = api.getCurrentUser();
       const topicController = api.container.lookup("controller:topic");
 
@@ -142,7 +144,7 @@ async function createPageVisitRecord(data, postIds, time, useBeacon = false) {
   if (useBeacon && navigator.sendBeacon) {
     // Use sendBeacon for reliable delivery during page unload
     // FormData is the most reliable format for sendBeacon
-    const formData = createFormDataFromPayload(payload);
+    const formData = createFormDataFromPayload(payload, session?.csrfToken);
     const url = new URL("/page-visits.json", window.location.origin);
     navigator.sendBeacon(url.toString(), formData);
   } else {
@@ -155,7 +157,7 @@ async function createPageVisitRecord(data, postIds, time, useBeacon = false) {
     } catch {
       // If ajax fails and we're unloading, fallback to sendBeacon
       if (navigator.sendBeacon) {
-        const formData = createFormDataFromPayload(payload);
+        const formData = createFormDataFromPayload(payload, session?.csrfToken);
         const url = new URL("/page-visits.json", window.location.origin);
         navigator.sendBeacon(url.toString(), formData);
       }
@@ -163,8 +165,12 @@ async function createPageVisitRecord(data, postIds, time, useBeacon = false) {
   }
 }
 
-function createFormDataFromPayload(payload) {
+function createFormDataFromPayload(payload, csrfToken) {
   const formData = new FormData();
+
+  if (csrfToken) {
+    formData.append("authenticity_token", csrfToken);
+  }
 
   if (payload.user_id !== null && payload.user_id !== undefined) {
     formData.append("user_id", payload.user_id);

@@ -170,7 +170,6 @@ async function createPageVisitRecord(data, postIds, time, useBeacon = false) {
     } catch {
       // If ajax fails and we're unloading, fallback to sendBeacon
       if (navigator.sendBeacon) {
-
         // Ensure CSRF token is available
         if (!session?.csrfToken) {
           await updateCsrfToken();

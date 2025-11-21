@@ -1,4 +1,4 @@
-import { ajax } from "discourse/lib/ajax";
+import { ajax, updateCsrfToken } from "discourse/lib/ajax";
 import discourseDebounce from "discourse/lib/debounce";
 import { withPluginApi } from "discourse/lib/plugin-api";
 
@@ -31,6 +31,13 @@ export default {
 
       // capture when page is being unloaded (tab close, browser back/forward)
       window.addEventListener("pagehide", () => {
+        const useBeacon = true;
+        const skipTimeCheck = true;
+        flushVisitRecord(useBeacon, skipTimeCheck);
+      });
+
+      // Safari fallback - beforeunload sometimes works when pagehide doesn't
+      window.addEventListener("beforeunload", () => {
         const useBeacon = true;
         const skipTimeCheck = true;
         flushVisitRecord(useBeacon, skipTimeCheck);
@@ -144,6 +151,12 @@ async function createPageVisitRecord(data, postIds, time, useBeacon = false) {
   if (useBeacon && navigator.sendBeacon) {
     // Use sendBeacon for reliable delivery during page unload
     // FormData is the most reliable format for sendBeacon
+
+    // Ensure CSRF token is available before sending
+    if (!session?.csrfToken) {
+      await updateCsrfToken();
+    }
+
     const formData = createFormDataFromPayload(payload, session?.csrfToken);
     const url = new URL("/page-visits.json", window.location.origin);
     navigator.sendBeacon(url.toString(), formData);
@@ -157,6 +170,12 @@ async function createPageVisitRecord(data, postIds, time, useBeacon = false) {
     } catch {
       // If ajax fails and we're unloading, fallback to sendBeacon
       if (navigator.sendBeacon) {
+
+        // Ensure CSRF token is available
+        if (!session?.csrfToken) {
+          await updateCsrfToken();
+        }
+
         const formData = createFormDataFromPayload(payload, session?.csrfToken);
         const url = new URL("/page-visits.json", window.location.origin);
         navigator.sendBeacon(url.toString(), formData);

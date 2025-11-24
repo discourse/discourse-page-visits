@@ -127,7 +127,6 @@ RSpec.describe "Page Visits", type: :system do
     before { SiteSetting.discourse_page_visits_enabled = true }
 
     it "creates a page visit record when user leaves the page via visibilitychange" do
-
       topic_page.visit_topic(topic)
 
       # manually trigger the visibility change event

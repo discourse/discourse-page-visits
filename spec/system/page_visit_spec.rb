@@ -7,6 +7,10 @@ RSpec.describe "Page Visits", type: :system do
 
   let(:topic_page) { PageObjects::Pages::Topic.new }
 
+  # Enable CSRF protection to test real-world behavior
+  before { ActionController::Base.allow_forgery_protection = true }
+  after { ActionController::Base.allow_forgery_protection = false }
+
   context "when user is authenticated" do
     before do
       SiteSetting.discourse_page_visits_enabled = true
@@ -123,12 +127,12 @@ RSpec.describe "Page Visits", type: :system do
     before { SiteSetting.discourse_page_visits_enabled = true }
 
     it "creates a page visit record when user leaves the page via visibilitychange" do
+
       topic_page.visit_topic(topic)
 
       # manually trigger the visibility change event
       page.execute_script("Object.defineProperty(document, 'visibilityState', { value: 'hidden' })")
       page.execute_script("document.dispatchEvent(new Event('visibilitychange'))")
-
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
         expect(visit_record).to have_attributes(
@@ -180,7 +184,18 @@ RSpec.describe "Page Visits", type: :system do
 
     it "creates a page visit record when the user changes the page" do
       topic_page.visit_topic(topic)
+
+      # Wait for navigation to complete
+      try_until_success do
+        expect(page).to have_current_path("/t/#{topic.slug}/#{topic.id}")
+      end
+
       find("#site-logo").click
+
+      # Wait for navigation to complete
+      try_until_success do
+        expect(page).to have_current_path("/")
+      end
 
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last

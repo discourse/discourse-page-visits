@@ -58,7 +58,12 @@ export default {
         }
       }
 
-      api.onPageChange(() => {
+      api.onPageChange(async () => {
+        // Ensure CSRF token is available
+        if (!session?.csrfToken) {
+          await updateCsrfToken();
+        }
+
         // Log previous visit before navigating to new page
         const useBeacon = false;
         flushVisitRecord(useBeacon);

@@ -11,13 +11,15 @@ end
 # Table name: page_visits
 #
 #  id         :bigint           not null, primary key
-#  user_id    :integer
 #  full_url   :string           not null
 #  ip_address :string           not null
-#  user_agent :string           not null
-#  topic_id   :integer
 #  post_ids   :integer          is an Array
-#  visit_time :integer          not null
+#  referer    :string(2000)
+#  user_agent :string           not null
+#  visit_time :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  session_id :string(32)       not null
+#  topic_id   :integer
+#  user_id    :integer
 #

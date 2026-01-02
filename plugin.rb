@@ -15,3 +15,17 @@ module ::DiscoursePageVisits
 end
 
 require_relative "lib/discourse_page_visits/engine"
+
+after_initialize do
+  on(:page_visited) do |payload|
+    DiscoursePageVisits::PageVisit.create!(
+      full_url: payload[:url],
+      ip_address: payload[:ip_address],
+      referer: payload[:referrer],
+      user_agent: payload[:user_agent],
+      session_id: payload[:session_id],
+      user_id: payload[:user_id],
+      topic_id: payload[:topic_id],
+    )
+  end
+end

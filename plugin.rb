@@ -25,6 +25,7 @@ after_initialize do
       user_agent: payload[:user_agent],
       session_id: payload[:session_id],
       user_id: payload[:user_id],
+      topic_id: payload[:topic_id],
     )
   end
 end

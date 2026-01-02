@@ -49,8 +49,9 @@ RSpec.describe "Page Visit Tracking" do
           ip_address: "11.34.111.45",
           session_id: "test-session-123",
           referer: "http://test.localhost/",
+          topic_id: topic.id,
+          user_agent: real_browser_agent,
         )
-        expect(visit_record.user_agent).to be_present
       end
 
       it "creates a PageVisit record when visiting a non-topic page" do

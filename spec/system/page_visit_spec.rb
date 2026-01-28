@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "Page Visits", type: :system do
+RSpec.describe "Page Visits" do
   fab!(:topic)
   fab!(:post) { Fabricate(:post, topic: topic) }
   fab!(:current_user) { Fabricate(:user, refresh_auto_groups: true) }
@@ -26,10 +26,7 @@ RSpec.describe "Page Visits", type: :system do
 
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
-        expect(visit_record).to have_attributes(
-          user_id: current_user.id,
-          topic_id: topic.id,
-        )
+        expect(visit_record).to have_attributes(user_id: current_user.id, topic_id: topic.id)
         expect(visit_record.full_url).to include(topic.slug)
         expect(visit_record.visit_time).to be > 0
         expect(visit_record.visit_time).to be < 10_000 # Should be less than 10 seconds for test
@@ -44,10 +41,7 @@ RSpec.describe "Page Visits", type: :system do
 
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
-        expect(visit_record).to have_attributes(
-          user_id: current_user.id,
-          topic_id: topic.id,
-        )
+        expect(visit_record).to have_attributes(user_id: current_user.id, topic_id: topic.id)
         expect(visit_record.full_url).to include(topic.slug)
         expect(visit_record.visit_time).to be > 0
         expect(visit_record.visit_time).to be < 10_000 # Should be less than 10 seconds for test
@@ -60,10 +54,7 @@ RSpec.describe "Page Visits", type: :system do
 
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
-        expect(visit_record).to have_attributes(
-          user_id: current_user.id,
-          topic_id: topic.id,
-        )
+        expect(visit_record).to have_attributes(user_id: current_user.id, topic_id: topic.id)
         expect(visit_record.full_url).to include(topic.slug)
         expect(visit_record.visit_time).to be > 0
         expect(visit_record.visit_time).to be < 10_000 # Should be less than 10 seconds for test
@@ -79,10 +70,7 @@ RSpec.describe "Page Visits", type: :system do
 
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
-        expect(visit_record).to have_attributes(
-          user_id: current_user.id,
-          topic_id: nil,
-        )
+        expect(visit_record).to have_attributes(user_id: current_user.id, topic_id: nil)
         expect(visit_record.full_url).to include("/")
         expect(visit_record.visit_time).to be > 0
         expect(visit_record.visit_time).to be < 10_000 # Should be less than 10 seconds for test
@@ -107,10 +95,7 @@ RSpec.describe "Page Visits", type: :system do
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.find_by(topic_id: topic.id)
         expect(visit_record).to be_present
-        expect(visit_record).to have_attributes(
-          user_id: current_user.id,
-          topic_id: topic.id,
-        )
+        expect(visit_record).to have_attributes(user_id: current_user.id, topic_id: topic.id)
         expect(visit_record.full_url).to include(topic.slug)
         # Visit time should be at least 200ms (the sleep time) minus some buffer
         expect(visit_record.visit_time).to be >= 100
@@ -134,10 +119,7 @@ RSpec.describe "Page Visits", type: :system do
       page.execute_script("document.dispatchEvent(new Event('visibilitychange'))")
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
-        expect(visit_record).to have_attributes(
-          user_id: nil,
-          topic_id: topic.id,
-        )
+        expect(visit_record).to have_attributes(user_id: nil, topic_id: topic.id)
         expect(visit_record.full_url).to include(topic.slug)
         expect(visit_record.visit_time).to be > 0
         expect(visit_record.visit_time).to be < 10_000 # Should be less than 10 seconds for test
@@ -153,10 +135,7 @@ RSpec.describe "Page Visits", type: :system do
 
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
-        expect(visit_record).to have_attributes(
-          user_id: nil,
-          topic_id: nil,
-        )
+        expect(visit_record).to have_attributes(user_id: nil, topic_id: nil)
         expect(visit_record.full_url).to include("/")
         expect(visit_record.visit_time).to be > 0
         expect(visit_record.visit_time).to be < 10_000 # Should be less than 10 seconds for test
@@ -171,10 +150,7 @@ RSpec.describe "Page Visits", type: :system do
 
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
-        expect(visit_record).to have_attributes(
-          user_id: nil,
-          topic_id: topic.id,
-        )
+        expect(visit_record).to have_attributes(user_id: nil, topic_id: topic.id)
         expect(visit_record.full_url).to include(topic.slug)
         expect(visit_record.visit_time).to be > 0
         expect(visit_record.visit_time).to be < 10_000 # Should be less than 10 seconds for test
@@ -185,23 +161,16 @@ RSpec.describe "Page Visits", type: :system do
       topic_page.visit_topic(topic)
 
       # Wait for navigation to complete
-      try_until_success do
-        expect(page).to have_current_path("/t/#{topic.slug}/#{topic.id}")
-      end
+      try_until_success { expect(page).to have_current_path("/t/#{topic.slug}/#{topic.id}") }
 
       find("#site-logo").click
 
       # Wait for navigation to complete
-      try_until_success do
-        expect(page).to have_current_path("/")
-      end
+      try_until_success { expect(page).to have_current_path("/") }
 
       try_until_success do
         visit_record = DiscoursePageVisits::PageVisit.last
-        expect(visit_record).to have_attributes(
-          user_id: nil,
-          topic_id: topic.id,
-        )
+        expect(visit_record).to have_attributes(user_id: nil, topic_id: topic.id)
         expect(visit_record.full_url).to include(topic.slug)
         expect(visit_record.visit_time).to be > 0
         expect(visit_record.visit_time).to be < 10_000 # Should be less than 10 seconds for test

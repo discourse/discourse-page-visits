@@ -6,7 +6,11 @@ module ::DiscoursePageVisits
 
     def create
       params_with_request =
-        page_visit_params.merge(ip_address: request.remote_ip, user_agent: request.user_agent)
+        page_visit_params.merge(
+          ip_address: request.remote_ip,
+          user_agent: request.user_agent,
+          user_id: current_user&.id,
+        )
       new_page_visit = PageVisit.new(params_with_request)
 
       if new_page_visit.save
@@ -19,7 +23,7 @@ module ::DiscoursePageVisits
     private
 
     def page_visit_params
-      params.permit(:visit_time, :full_url, :user_id, :topic_id, :ip_address, post_ids: [])
+      params.permit(:visit_time, :full_url, :topic_id, post_ids: [])
     end
   end
 end
